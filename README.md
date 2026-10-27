@@ -77,7 +77,29 @@ Output:
 +----+---------------+--------------------+
 ```
 
-### 4. Custom Data File (`--file`)
+### 4. Sort Results (`--sort`)
+Sort matching records alphabetically by `name` or `email` (case-insensitive). `--sort` is optional and may be combined with any search flag:
+```bash
+python -m src.cli --email example --sort name
+```
+Output:
+```text
++----+-------------+-------------------+
+| ID | Name        | Email             |
++----+-------------+-------------------+
+| 1  | Alice Smith | alice@example.com |
+| 2  | Bob Jones   | bob@example.com   |
++----+-------------+-------------------+
+```
+
+Sort by email address:
+```bash
+python -m src.cli --query example --sort email
+```
+
+**Accepted values:** `name`, `email`. Any other value is rejected with a usage error.
+
+### 5. Custom Data File (`--file`)
 Specify a custom customer JSON file path:
 ```bash
 python -m src.cli --file path/to/customers.json --name Alice
@@ -103,4 +125,4 @@ Execute the automated test suite using `pytest`:
 ```bash
 pytest -v
 ```
-All 49 unit, integration, persistence, validation, and CLI test scenarios will run and verify requirements compliance in under 1 second.
+All 62 unit, integration, persistence, validation, sorting, and CLI test scenarios will run and verify requirements compliance in under 1 second.
