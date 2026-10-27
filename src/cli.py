@@ -76,6 +76,13 @@ def build_parser() -> argparse.ArgumentParser:
         default="customers.json",
         help="Path to customer JSON data file (default: customers.json)",
     )
+    parser.add_argument(
+        "--sort",
+        type=str,
+        choices=["name", "email"],
+        default=None,
+        help="Sort matching results alphabetically by 'name' or 'email' (case-insensitive)",
+    )
     return parser
 
 
@@ -118,6 +125,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not results:
         print(f"MESSAGE: No customers found that matched {query.strip()}")
         return 0
+
+    if args.sort is not None:
+        sort_key = args.sort
+        results = sorted(results, key=lambda r: str(r.get(sort_key, "")).lower())
 
     table = format_table(results)
     print(table)
