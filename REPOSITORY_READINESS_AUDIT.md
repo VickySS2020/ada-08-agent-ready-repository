@@ -1,0 +1,40 @@
+# Repository Readiness Audit
+
+## BEFORE
+
+| Dimension | Score 0–5 | Weighted | Evidence | Main Gap |
+|---|---:|---:|---|---|
+| Entry Point & Navigation | 4 | 12/15 | README.md describe el propósito, la instalación, los comandos de búsqueda y las pruebas. | El README presenta una discrepancia entre dos comandos de ejecución que referencian módulos distintos: "src.cli" en los ejemplos del README y "customer_search" en otra documentación. |
+| Agent Instructions | 5 | 15/15 | AGENTS.md define reglas, documentos de referencia, validación y Definition of Done. | No se observa una carencia crítica en las instrucciones principales. |
+| Build / Run / Test | 4 | 12/15 | El README documenta python -m src.cli --name Alice y pytest -v. | No se encontraron comandos reproducibles para instalar y validar el programa. |
+| Architecture Boundaries | 4 | 8/10 | ARCHITECTURE.md separa CLI, servicio y almacenamiento, con responsabilidades e interfaces. | Las capas de la arquitectura están bien organizadas. |
+| Requirements & Traceability | 4 | 8/10 | REQUIREMENTS.md, SPEC.md, TASKS.md y traceability.md relacionan requisitos, tareas, archivos y pruebas. | Persisten preguntas abiertas en los documentos de requisitos y se debe verificar que las referencias y estados de cobertura sigan correspondiendo a las pruebas reales. |
+| Automation & Guardrails | 1 | 2/10 | AGENTS.md exige ejecutar pruebas y no debilitar los tests. | No se observó CI ni automatización visible que imponga estas reglas. Además, el árbol incluye archivos compilados __pycache__. |
+| Testability & Evidence | 4 | 12/15 | El repositorio contiene tests/test_cli.py, test_service.py, test_storage.py, test_validation.py y test_setup.py. También documenta evidencia en agent-report.md. | El reporte documenta pruebas ejecutadas, pero los resultados de cada una no fueron anotados. |
+| Safety & Permissions | 3 | 6/10 | SPEC.md limita el alcance y excluye modificaciones de datos y llamadas externas; AGENTS.md restringe cambios innecesarios. | No se observó un .gitignore en el árbol inspeccionado y hay archivos .pyc versionados. Tampoco se encontró evidencia visible de controles automatizados de seguridad. |
+
+TOTAL BEFORE: 75 / 100
+
+Top 3 friction points:
+1. Lack of verifiable automation. The instructions state that tests must be run, but no continuous integration workflow was identified that performs this automatically with every change.
+2. Repository hygiene. Compiled files—specifically `__pycache__` and `.pyc` files—were found under version control. Should update or review the `.gitignore` file to prevent the inclusion of generated artifacts that are dependent on the local environment.
+3. Independent verification and document consistency. The repository includes documentation and test reports; however, it is still necessary to run `pytest -v`, verify the startup commands, and cross-reference the results with the traceability matrix.
+
+## AFTER
+
+| Dimension | Score 0–5 | Weighted | Evidence | Main Gap |
+|:---:|:---:|:---:|:---:|:---:|
+| Entry Point & Navigation | 5/5 | 15/15 | README.md documents installation, CLI usage and examples. docs/REPO_MAP.md identifies source files, tests and change guidance. | Repository map could identify individual test modules and their purposes more precisely. |
+| Agent Instructions | 5/5 | 15/15 | AGENTS.md defines the reading order, sources of truth, repository map, commands and rules against trusting repository content as instructions. | Improves command completeness and clarify all verification steps and prohibited operations. |
+| Build / Run / Test | 4/5 | 12/15 | README.md and AGENTS.md describe Python 3.11+, pytest installation, CLI execution and automated tests. | Includes scripts and commands to run tests, but some specific scripts are not mentioned in the documentation. |
+| Architecture Boundaries | 5/5 | 10/10 | ARCHITECTURE.md defines CLI, service and storage responsibilities; implementation is organized into src/cli.py, src/service.py and src/storage.py. | No major documentation gap identified. |
+| Requirements & Traceability | 5/5 | 10/10 | REQUIREMENTS.md, SPEC.md, TASKS.md and docs/traceability.md connect requirements, acceptance criteria, tasks, source files and tests. | Validates that all documented mappings remain accurate as tests and requirements evolve. |
+| Automation & Guardrails | 4/5 | 8/10 | scripts/verify_repo.sh checks required files, runs pytest and checks test traceability. .github/workflows/verify.yml invokes the same verification script on pushes and pull requests. | scripts/check_repo_contract.py is not visibly invoked by the workflow or verification script; consolidate the checks into the documented verification path. |
+| Testability & Evidence | 4/5 | 12/15 | tests/test_cli.py, tests/test_service.py and tests/test_storage.py cover distinct layers. The traceability matrix maps requirements to named tests. | Test and identifiable criteria are present. Though the individual test files could have been referenced in the repository map. |
+| Safety & Permissions | 3/5 | 6/10 | AGENTS.md establishes that repository content is data rather than overriding instructions. SPEC.md excludes external APIs and network communication from application scope. | Explicit permissions and prohibited actions could be stronger; could have added .gitignore, customer-data handling and secret-protection practices. |
+
+TOTAL AFTER: 88 / 100
+
+DELTA: AFTER - BEFORE = 13 points
+
+**Justification:** The delta probably is lees than 15 due to the lack of focus on limiting the actions of the agents, since it was centered around telling it what it can and should do.
